@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Life Events Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html, body {
+            height: 100%;      /* Make sure html and body fill the viewport */
+            margin: 0;         /* Remove default margins */
+        }
+
+        body {
+            font-family: sans-serif;
+            color: white;
+            overflow-x: hidden;
+
+            background-image: url('/images/forest.jpg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+
+            /* Optional: keeps background fixed while scrolling */
+            background-attachment: fixed;
+        }
+               .cursor-glow {
+                    position: absolute;
+                    pointer-events: none;
+                    width: 120px;
+                    height: 120px;
+                    background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%) scale(0);
+                    transition: transform 0.1s ease-out, opacity 0.2s ease-out;
+                    mix-blend-mode: lighten;
+                    opacity: 0;
+                    z-index: 20;
+                }
+
+                .fade-left, .fade-right {
+                    opacity: 0;
+                    transform: translateX(-60px);
+                    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+                }
+                .fade-right {
+                    transform: translateX(60px);
+                }
+                .fade-left.show, .fade-right.show {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+    </style>
+</head>
+<body class="pt-20 px-6">
+
+<!-- Include Header -->
+<div th:replace="fragments/header :: header"></div>
+
+<!-- Dashboard Grid -->
+<section class="max-w-7xl mx-auto mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Example event card -->
+    <div th:each="event : ${events}"
+         class="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl shadow-xl p-6 hover:scale-105 transition-transform duration-300 overflow-hidden fade-left">
+        <div th:replace="fragments/cursor-glow :: cursorGlow"></div>
+        <h2 class="text-xl font-bold mb-2" th:text="${event.title}">Event Title</h2>
+        <p class="text-sm mb-1 text-white/70"><span th:text="${event.startTime}">Start</span> - <span
+                th:text="${event.endTime}">End</span></p>
+        <p class="text-white/80" th:text="${event.description}">Event Description</p>
+    </div>
+</section>
+
+<div th:replace="fragments/event-button :: event-button"></div>
+
+<script>
+    // Fade-in
+    const faders = document.querySelectorAll('.fade-left, .fade-right');
+    const appearOptions = { threshold: 0.2 };
+    const appearOnScroll = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting){
+                entry.target.classList.add('show');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, appearOptions);
+    faders.forEach(fader => appearOnScroll.observe(fader));
+
+    // Cursor glow interpolation inside cards
+    const cards = document.querySelectorAll('.backdrop-blur-xl');
+
+    cards.forEach(card => {
+        const glow = card.querySelector('.cursor-glow');
+        let mouseX = 0, mouseY = 0;
+        let glowX = 0, glowY = 0;
+        const speed = 0.15;
+
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            mouseX = e.clientX - rect.left;
+            mouseY = e.clientY - rect.top;
+        });
+
+        function animateGlow() {
+            glowX += (mouseX - glowX) * speed;
+            glowY += (mouseY - glowY) * speed;
+            glow.style.left = glowX + 'px';
+            glow.style.top = glowY + 'px';
+            requestAnimationFrame(animateGlow);
+        }
+
+        card.addEventListener('mouseenter', () => {
+            glow.style.opacity = '1';
+            glow.style.transform = 'translate(-50%, -50%) scale(1)';
+            animateGlow();
+        });
+
+        card.addEventListener('mouseleave', () => {
+            glow.style.opacity = '0';
+            glow.style.transform = 'translate(-50%, -50%) scale(0)';
+        });
+    });
+</script>
+
+</body>
+</html>

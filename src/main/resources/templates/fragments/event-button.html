@@ -1,0 +1,17 @@
+<div th:fragment="event-button">
+    <button id="addEventBtn"
+            class="fixed bottom-8 right-8 w-16 h-16 bg-purple-600 hover:bg-purple-700 text-white rounded-full shadow-xl flex items-center justify-center text-3xl font-bold z-50 transition-transform transform hover:scale-110">
+        +
+    </button>
+
+    <div class="add-event-ui-button" th:replace="fragments/add-event :: add-event"></div>
+    <script>
+        const addEventBtn = document.getElementById('addEventBtn');
+
+        // Open modal when + is clicked
+        addEventBtn.addEventListener('click', () => {
+            eventModal.classList.remove('opacity-0', 'pointer-events-none');
+            eventModal.classList.add('opacity-100');
+        });
+    </script>
+</div>

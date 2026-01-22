@@ -1,0 +1,93 @@
+<div th:fragment="add-event">
+    <div id="eventModal"
+         class="fixed inset-0 bg-black/30 flex items-center justify-center opacity-0 pointer-events-none transition-opacity z-40">
+        <div class="bg-white/5 backdrop-blur-3xl border border-white/10 shadow-2xl rounded-3xl p-8 w-full max-w-md relative
+                ring-1 ring-white/20">
+            <h2 class="text-2xl font-bold mb-4 text-white drop-shadow-sm">Add New Event</h2>
+            <form id="eventForm" class="space-y-4 text-white">
+                <div>
+                    <label class="block font-semibold mb-1 text-white/70">Title</label>
+                    <input type="text" name="title" required
+                           class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white placeholder-white/50
+                              focus:outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white/20 transition">
+                </div>
+                    <!-- Start Time -->
+                    <div>
+                        <label class="block font-semibold mb-1 text-white/70">Start Time</label>
+                        <input type="datetime-local" name="startTime" required
+                               class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white placeholder-white/50
+                  focus:outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white/20 transition">
+                    </div>
+
+                    <!-- End Time (new row) -->
+                    <div>
+                        <label class="block font-semibold mb-1 text-white/70">End Time</label>
+                        <input type="datetime-local" name="endTime" required
+                               class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white placeholder-white/50
+                  focus:outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white/20 transition">
+                    </div>
+                <div>
+                    <label class="block font-semibold mb-1 text-white/70">Description</label>
+                    <textarea name="description" rows="4" required
+                              class="w-full bg-white/10 border border-white/20 rounded-lg p-2 text-white placeholder-white/50
+                                 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white/20 transition"></textarea>
+                </div>
+                <div class="flex justify-end gap-2 mt-4">
+                    <button type="button" id="cancelBtn"
+                            class="px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 text-white transition shadow-sm">
+                        Cancel
+                    </button>
+                    <button type="submit"
+                            class="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition shadow-md">
+                        Add Event
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Modal logic
+        const eventModal = document.getElementById('eventModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const eventForm = document.getElementById('eventForm');
+
+        function hideModal() {
+            eventModal.classList.add('opacity-0');
+            eventModal.classList.remove('opacity-100');
+            // Wait for transition to finish before disabling pointer events
+            setTimeout(() => {
+                eventModal.classList.add('pointer-events-none');
+            }, 300); // matches transition duration
+            eventForm.reset();
+        }
+
+        cancelBtn.addEventListener('click', hideModal);
+        eventModal.addEventListener('click', (e) => {
+            if (e.target === eventModal) hideModal();
+        });
+
+        eventForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData(eventForm);
+            const newEvent = {
+                title: formData.get('title'),
+                startTime: formData.get('startTime'),
+                endTime: formData.get('endTime'),
+                description: formData.get('description')
+            };
+            fetch("/events/add", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(newEvent),
+              credentials: "include" // <<< this is all you need!
+            })
+            .then(res => res.json())
+            .then(console.log)
+            .catch(console.error);
+            hideModal();
+        });
+    </script>
+</div>

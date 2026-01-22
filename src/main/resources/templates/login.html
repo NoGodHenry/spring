@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Life Events Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            background: linear-gradient(to right, #040204, #2b0055, #4b0082);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Cursor glow inside card */
+        .cursor-glow {
+            position: absolute;
+            pointer-events: none;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.1s ease-out, opacity 0.2s ease-out;
+            mix-blend-mode: lighten;
+            opacity: 0;
+            z-index: 20;
+        }
+
+        /* Fade-in animation */
+        .fade-left, .fade-right {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+        .fade-right {
+            transform: translateX(60px);
+        }
+        .fade-left.show, .fade-right.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen px-6 relative">
+
+<!-- Login Card -->
+<div class="relative backdrop-blur-xl bg-white/20 border border-white/30 rounded-2xl shadow-xl max-w-md w-full p-10 fade-left overflow-hidden">
+    <!-- Cursor Glow -->
+    <div th:replace="fragments/cursor-glow :: cursorGlow"></div>
+
+    <h1 class="text-3xl font-bold mb-6 text-center">Login to Life Events</h1>
+
+    <form action="/auth/login" method="POST" class="space-y-6" id="loginForm">
+        <div>
+            <label for="username" class="block mb-2 font-semibold">Name</label>
+            <input type="text" id="username" name="username" required
+                   class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 focus:bg-white/20 focus:outline-none transition-colors duration-200" />
+        </div>
+        <div>
+            <label for="password" class="block mb-2 font-semibold">Password</label>
+            <input type="password" id="password" name="password" required
+                   class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/30 focus:bg-white/20 focus:outline-none transition-colors duration-200" />
+        </div>
+        <button type="submit"
+                class="w-full py-3 bg-purple-700/70 hover:bg-purple-600/80 rounded-full font-semibold text-lg transition-colors duration-300 shadow-lg">
+            Login
+        </button>
+    </form>
+
+    <p class="mt-6 text-center text-white/70">
+        Don't have an account?
+        <a href="/register" class="text-purple-300 hover:text-purple-200 font-semibold">Sign Up</a>
+    </p>
+</div>
+
+<script>
+    // Fade animation
+    const faders = document.querySelectorAll('.fade-left, .fade-right');
+    const appearOptions = { threshold: 0.2 };
+    const appearOnScroll = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if(entry.isIntersecting){
+                entry.target.classList.add('show');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, appearOptions);
+    faders.forEach(fader => appearOnScroll.observe(fader));
+
+    // Cursor glow inside login card
+    const loginCard = document.querySelector('.backdrop-blur-xl');
+    const glow = loginCard.querySelector('.cursor-glow');
+
+    loginCard.addEventListener('mousemove', e => {
+        const rect = loginCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        glow.style.left = x + 'px';
+        glow.style.top = y + 'px';
+    });
+
+    loginCard.addEventListener('mouseenter', () => {
+        glow.style.opacity = '1';
+        glow.style.transform = 'translate(-50%, -50%) scale(1)';
+    });
+
+    loginCard.addEventListener('mouseleave', () => {
+        glow.style.opacity = '0';
+        glow.style.transform = 'translate(-50%, -50%) scale(0)';
+    });
+
+    const form = document.getElementById('loginForm');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        fetch(form.action, {
+            method: form.method,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(res => res.json())
+        .then(result => {
+            console.log(result);
+            // handle login success/failure
+            if(result.success) {
+                window.location.href = '/dashboard'; // redirect in JS
+            } else {
+                alert(result.message);
+            }
+        })
+        .catch(err => console.error(err));
+    });
+</script>
+
+</body>
+</html>

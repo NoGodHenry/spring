@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Events Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Cursor glow inside card */
+        .cursor-glow {
+            position: absolute;
+            pointer-events: none;
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.1s ease-out, opacity 0.2s ease-out;
+            mix-blend-mode: lighten;
+            opacity: 0;
+            z-index: 20;
+        }
+
+        /* Scroll animation */
+        .fade-left, .fade-right {
+            opacity: 0;
+            transform: translateX(-60px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-right {
+            transform: translateX(60px);
+        }
+
+        .fade-left.show, .fade-right.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body class="relative font-sans text-white overflow-x-hidden">
+
+<!-- Top Navbar -->
+<div th:replace="fragments/header :: header"></div>
+
+
+<!-- Hero Section -->
+<section class="h-screen flex flex-col justify-center items-center text-center px-6"
+         style="background: linear-gradient(to right, #040204, #2b0055, #4b0082);">
+    <h1 class="text-5xl md:text-6xl font-extrabold drop-shadow-lg fade-left">Organize Your Life</h1>
+    <p class="mt-4 text-xl md:text-2xl max-w-2xl drop-shadow-lg fade-right">
+        Manage your events, plan your day, and take control of your life in a beautifully modern interface.
+    </p>
+
+    <!-- Glass boxes -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+        <div class="relative backdrop-blur-xl bg-white/20 rounded-xl border border-white/30 p-6 shadow-lg hover:scale-105 transition-transform duration-300 fade-left">
+            <div class="cursor-glow"></div>
+            <h2 class="text-2xl font-semibold mb-2">Add Events</h2>
+            <p>Quickly create new events and reminders.</p>
+        </div>
+        <div class="relative backdrop-blur-xl bg-white/20 rounded-xl border border-white/30 p-6 shadow-lg hover:scale-105 transition-transform duration-300 fade-right">
+            <div class="cursor-glow"></div>
+            <h2 class="text-2xl font-semibold mb-2">Organize Tasks</h2>
+            <p>Sort, filter, and manage your tasks easily.</p>
+        </div>
+        <div class="relative backdrop-blur-xl bg-white/20 rounded-xl border border-white/30 p-6 shadow-lg hover:scale-105 transition-transform duration-300 fade-left">
+            <div class="cursor-glow"></div>
+            <h2 class="text-2xl font-semibold mb-2">Visual Calendar</h2>
+            <p>See your week/month at a glance with a clean calendar view.</p>
+        </div>
+    </div>
+
+    <a href="#features" class="mt-12 inline-block px-10 py-4 bg-purple-700/70 hover:bg-purple-600/80 rounded-full font-semibold text-lg transition-colors duration-300 backdrop-blur-md shadow-lg fade-right">
+        Explore More
+    </a>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="min-h-screen py-24 px-6 bg-gradient-to-b from-purple-900/90 via-purple-800/90 to-purple-700/95">
+    <h2 class="text-4xl md:text-5xl font-bold text-center mb-16 fade-left">Features</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="relative backdrop-blur-xl bg-white/25 rounded-xl border border-white/30 p-8 shadow-lg hover:scale-105 transition-transform duration-300 fade-left">
+            <div class="cursor-glow"></div>
+            <h3 class="text-2xl font-semibold mb-2">Personal Dashboard</h3>
+            <p>Keep track of your day and see upcoming events at a glance.</p>
+        </div>
+        <div class="relative backdrop-blur-xl bg-white/25 rounded-xl border border-white/30 p-8 shadow-lg hover:scale-105 transition-transform duration-300 fade-right">
+            <div class="cursor-glow"></div>
+            <h3 class="text-2xl font-semibold mb-2">Smart Reminders</h3>
+            <p>Never forget important tasks with intelligent notifications.</p>
+        </div>
+        <div class="relative backdrop-blur-xl bg-white/25 rounded-xl border border-white/30 p-8 shadow-lg hover:scale-105 transition-transform duration-300 fade-left">
+            <div class="cursor-glow"></div>
+            <h3 class="text-2xl font-semibold mb-2">Cross-Device Sync</h3>
+            <p>Access your events from your phone, tablet, or desktop seamlessly.</p>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="min-h-screen flex flex-col items-center justify-center text-center px-6 bg-gradient-to-b from-purple-800 to-purple-900 fade-right">
+    <h2 class="text-4xl md:text-5xl font-bold mb-6">Ready to take control of your life?</h2>
+    <p class="text-lg md:text-xl max-w-2xl mb-12">
+        Start organizing your events today and enjoy a beautifully clean interface that adapts to you.
+    </p>
+    <a href="/login" class="px-12 py-4 bg-purple-700/70 hover:bg-purple-600/80 rounded-full font-semibold text-lg transition-colors duration-300 backdrop-blur-md shadow-lg">
+        Get Started
+    </a>
+</section>
+
+<!-- Footer -->
+<footer class="py-12 text-center bg-purple-900/95 backdrop-blur-sm border-t border-white/30">
+    <p>&copy; 2026 Life Events Manager. All rights reserved.</p>
+</footer>
+
+<!-- JS for cursor inside cards and scroll animations -->
+<script>
+    // Scroll animations (left/right sweep)
+    const faders = document.querySelectorAll('.fade-left, .fade-right');
+    const appearOptions = { threshold: 0.2 };
+    const appearOnScroll = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting){
+          entry.target.classList.add('show');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, appearOptions);
+    faders.forEach(fader => appearOnScroll.observe(fader));
+
+    // Cursor glow inside each card
+    const glassCards = document.querySelectorAll('.backdrop-blur-xl');
+
+    glassCards.forEach(card => {
+        const glow = card.querySelector('.cursor-glow');
+
+        card.addEventListener('mousemove', e => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            glow.style.left = x + 'px';
+            glow.style.top = y + 'px';
+        });
+
+        card.addEventListener('mouseenter', () => {
+            glow.style.opacity = '1';
+            glow.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+
+        card.addEventListener('mouseleave', () => {
+            glow.style.opacity = '0';
+            glow.style.transform = 'translate(-50%, -50%) scale(0)';
+        });
+    });
+</script>
+
+</body>
+</html>
