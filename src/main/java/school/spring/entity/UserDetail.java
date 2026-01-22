@@ -1,6 +1,8 @@
 package school.spring.entity;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,5 +19,6 @@ public class UserDetail {
     @NotBlank
     private String displayName;
 
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 }
