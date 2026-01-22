@@ -1,38 +1,31 @@
 # ------------------- BUILD STAGE -------------------
-FROM ghcr.io/graalvm/graalvm-ce:21.3.0-java11 AS builder
+FROM ghcr.io/graalvm/jdk-community:21 AS builder
 
-# Set working directory
 WORKDIR /app
 
 # Copy Gradle wrapper and build files
 COPY gradlew .
 COPY gradle ./gradle
-COPY build.gradle.kts settings.gradle.kts ./
-
-# Pre-download dependencies to cache layers
-RUN ./gradlew build --dry-run
-
-# Copy the rest of the source code
+COPY build.gradle.kts .
+COPY settings.gradle.kts .
 COPY src ./src
 
-# Build the Spring Boot fat jar
+# Make gradlew executable
+RUN chmod +x ./gradlew
+
+# Build Spring Boot jar
 RUN ./gradlew clean bootJar -x test
 
 # ------------------- RUNTIME STAGE -------------------
-FROM ghcr.io/graalvm/graalvm-ce:21.3.0-java11
+FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-# Copy the fat jar from the builder stage
+# Copy the jar from the builder
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-# Expose application port
+# Expose port 8080
 EXPOSE 8080
-
-# Environment variables for MySQL (Rancher injects these as env vars)
-ENV SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/mydb
-ENV SPRING_DATASOURCE_USERNAME=root
-ENV SPRING_DATASOURCE_PASSWORD=password
 
 # Run the Spring Boot application
 ENTRYPOINT ["java","-jar","app.jar"]
