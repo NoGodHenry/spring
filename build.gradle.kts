@@ -26,7 +26,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
     implementation("com.h2database:h2")
-    implementation("mysql:mysql-connector-java:8.1.1")
+    implementation("mysql:mysql-connector-java")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
